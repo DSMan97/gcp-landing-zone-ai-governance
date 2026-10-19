@@ -1,0 +1,72 @@
+# =============================================================================
+# IntelliJ IDEA / JetBrains
+# =============================================================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# =============================================================================
+# Terraform Core & Local Cache
+# =============================================================================
+# Directorios de plugins y módulos descargados localmente
+**/.terraform/*
+.terraform/
+
+# Registros de fallos
+crash.log
+crash.*.log
+
+# =============================================================================
+# Archivos de Estado (State Files)
+# =============================================================================
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# =============================================================================
+# Archivos de Variables y Secretos (Tfvars)
+# =============================================================================
+# Excluir todos los archivos de variables con valores reales/sensibles
+*.tfvars
+*.tfvars.json
+
+# Permitir archivos de ejemplo / plantillas
+!*.tfvars.example
+!*.example.tfvars
+
+# =============================================================================
+# Archivos de Sobrescritura (Overrides)
+# =============================================================================
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# =============================================================================
+# Planes de Terraform y Archivos CLI
+# =============================================================================
+*.tfplan
+*.plan
+.terraformrc
+terraform.rc
+
+# =============================================================================
+# Lock File de Proveedores de Terraform
+# =============================================================================
+# Por defecto se ignora según solicitado.
+# Nota: Si el equipo busca fijar versiones exactas de providers entre colaboradores/CI,
+# puede comentarse esta línea para versionar el archivo .terraform.lock.hcl.
+.terraform.lock.hcl
+
+# =============================================================================
+# Archivos del Sistema Operativo
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
