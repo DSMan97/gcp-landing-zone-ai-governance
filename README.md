@@ -1,6 +1,6 @@
 # Plantilla: GCP Landing Zone - Enterprise Banking & Clinical Data Platform
 
-> Proyecto de aprendizaje y plantilla de referencia, no apta para producción sin adaptación.
+> ⚠️ Proyecto de aprendizaje y plantilla de referencia, no apta para producción sin adaptación.
 
 Landing Zone de nivel empresarial construida en Terraform para entidades altamente reguladas (Banca y Datos Clínicos/Salud), con cumplimiento de estándares **PCI-DSS**, **HIPAA**, **GDPR** e **ISO 27001**.
 
