@@ -118,6 +118,10 @@ Este diseño toma como punto de partida y extiende las directrices oficiales de 
 
 ## ☁️ Secuencia de Despliegue en CI/CD
 
+El siguiente diagrama resume cómo llega un cambio a producción: Pull Request, CI/CD con Workload Identity Federation (sin claves), `terraform plan`, aprobación y `terraform apply`, además de las capas desplegadas y la promoción entre entornos.
+
+![Flujo de despliegue](docs/Flujo%20de%20despliegue.png)
+
 1. **`bootstrap/`**: Inicializa buckets de estado cifrados con CMEK y Workload Identity Federation (WIF).
 2. **`foundation/00-organization/`**: Configura contactos esenciales y notificaciones de seguridad.
 3. **`foundation/01-folders/`**: Despliega la jerarquía aislada de carpetas para segregación de dominios.
