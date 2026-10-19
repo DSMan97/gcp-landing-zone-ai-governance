@@ -4,7 +4,7 @@ Landing Zone de nivel empresarial construida en Terraform para entidades altamen
 
 El diseño prioriza la **gobernanza organizacional preventiva**, **perímetros de seguridad (VPC Service Controls)**, **cifrado CMEK con rotación automática**, segregación estricta de dominios y el principio de **mínimo privilegio (Least Privilege IAM)** auditado con expresiones CEL.
 
-![Arquitectura GCP Landing Zone](docs/gcp-landing-zone.png)
+![Arquitectura GCP Landing Zone](docs/gcp-landing-zone-ai.png)
 
 ---
 
@@ -42,7 +42,9 @@ gcp-landing-zone/
 │   ├── log-sink/
 │   ├── project-factory/
 │   ├── data-governance-labels/
-│   └── vpc-sc-perimeter/
+│   ├── vpc-sc-perimeter/
+│   ├── cmek-kms/
+│   └── ai-workload-project/
 ├── environments/
 │   ├── dev/
 │   ├── stg/
