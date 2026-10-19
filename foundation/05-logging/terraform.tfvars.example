@@ -1,0 +1,6 @@
+/**
+ * Phase 05: Logging & Audit - Example tfvars
+ */
+
+organization_id       = "123456789012"
+audit_logs_project_id = "prj-sec-audit-logs"

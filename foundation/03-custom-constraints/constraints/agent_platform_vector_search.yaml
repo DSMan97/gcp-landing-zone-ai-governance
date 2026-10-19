@@ -1,0 +1,22 @@
+- name: "custom.vertexAiVectorSearchRequireCmek"
+  resource_types:
+    - "aiplatform.googleapis.com/Index"
+    - "aiplatform.googleapis.com/IndexEndpoint"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.encryptionSpec.kmsKeyName) || resource.encryptionSpec.kmsKeyName == ''"
+  action_type: "DENY"
+  display_name: "Enforce CMEK on Vector Search Resources"
+  description: "Requires Customer Managed Encryption Keys (CMEK) on Vertex AI Vector Search Indexes and IndexEndpoints."
+
+- name: "custom.vertexAiVectorSearchRequirePrivateNetwork"
+  resource_types:
+    - "aiplatform.googleapis.com/IndexEndpoint"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.network) || resource.network == '' || (has(resource.publicEndpointEnabled) && resource.publicEndpointEnabled == true)"
+  action_type: "DENY"
+  display_name: "Enforce Private Network on Vector Search Endpoints"
+  description: "Requires Vertex AI Vector Search IndexEndpoints to use private VPC peering and prohibits public endpoint exposure."

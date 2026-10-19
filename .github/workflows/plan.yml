@@ -1,0 +1,67 @@
+name: "Terraform Plan - GCP Landing Zone"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "gcp-landing-zone/**"
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  plan:
+    name: "Validate & Speculative Plan"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gcp-landing-zone
+
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Authenticate to Google Cloud via WIF"
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/123456789012/locations/global/workloadIdentityPools/pool-github-actions/providers/provider-github"
+          service_account: "sa-tf-bootstrap@prj-seed-bootstrap-0123.iam.gserviceaccount.com"
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: "Format Check"
+        run: terraform fmt -check -recursive
+
+      - name: "Validate Modules & Phases"
+        run: |
+          for dir in \
+            "modules/org-policy" \
+            "modules/custom-constraint" \
+            "modules/iam-conditional-binding" \
+            "modules/audit-config" \
+            "modules/log-sink" \
+            "modules/project-factory" \
+            "modules/data-governance-labels" \
+            "modules/vpc-sc-perimeter" \
+            "bootstrap" \
+            "foundation/00-organization" \
+            "foundation/01-folders" \
+            "foundation/02-org-policies" \
+            "foundation/03-custom-constraints" \
+            "foundation/04-iam" \
+            "foundation/05-logging" \
+            "foundation/06-networking" \
+            "foundation/07-ai-governance" \
+            "environments/dev" \
+            "environments/stg" \
+            "environments/prod"; do
+            echo "::group::Validating $dir"
+            (cd "$dir" && terraform init -backend=false && terraform validate)
+            echo "::endgroup::"
+          done

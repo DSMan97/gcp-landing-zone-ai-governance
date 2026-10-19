@@ -1,0 +1,16 @@
+/**
+ * Phase 04: IAM - Example tfvars
+ */
+
+prod_folder_id             = "folders/112233445566"
+service_account_project_id = "prj-prod-ai-platform"
+customer_id                = "C01234567"
+admin_user_email           = "workspace-admin@bank-clinical-enterprise.com"
+manage_workspace_groups    = true
+
+legal_team_group      = "gcp-legal-compliance@bank-clinical-enterprise.com"
+soc_team_group        = "gcp-soc-secops@bank-clinical-enterprise.com"
+break_glass_group     = "gcp-breakglass-admins@bank-clinical-enterprise.com"
+data_scientists_group = "gcp-data-scientists@bank-clinical-enterprise.com"
+agent_deployers_group = "gcp-agent-deployers@bank-clinical-enterprise.com"
+ai_auditors_group     = "gcp-ai-auditors@bank-clinical-enterprise.com"

@@ -1,0 +1,7 @@
+organization_id            = "123456789012"
+billing_account            = "012345-678901-ABCDEF"
+banking_stg_folder_id      = "folders/333333333333"
+clinical_stg_folder_id     = "folders/444444444444"
+banking_non_prod_folder_id = "folders/333333333333"
+clinical_non_prod_folder_id = "folders/444444444444"
+primary_region             = "europe-west1"

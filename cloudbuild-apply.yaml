@@ -1,0 +1,48 @@
+# ==============================================================================
+# Cloud Build - Apply Pipeline (Main Branch Push / Deployment)
+# Homólogo de .github/workflows/apply.yml
+# ==============================================================================
+
+substitutions:
+  _TERRAFORM_VERSION: '1.9.0'
+  _WORKDIR: 'gcp-landing-zone'
+
+steps:
+  # 1. Despliegue ordenado de fases de Landing Zone
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-apply-ordered-stages'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        stages=(
+          "bootstrap"
+          "foundation/00-organization"
+          "foundation/01-folders"
+          "foundation/02-org-policies"
+          "foundation/03-custom-constraints"
+          "foundation/04-iam"
+          "foundation/05-logging"
+          "foundation/06-networking"
+          "foundation/07-ai-governance"
+          "environments/dev"
+          "environments/stg"
+          "environments/prod"
+        )
+
+        echo "============================================================"
+        echo ">>> Iniciando Despliegue Ordenado de Landing Zone"
+        echo "============================================================"
+        for stage in "${stages[@]}"; do
+          if [ -d "$stage" ]; then
+            echo "--> Desplegando Etapa: $stage"
+            (cd "$stage" && terraform init && terraform apply -auto-approve -input=false)
+          else
+            echo "--> [ALERTA] Directorio no encontrado: $stage"
+            exit 1
+          fi
+        done
+
+options:
+  logging: CLOUD_LOGGING_ONLY

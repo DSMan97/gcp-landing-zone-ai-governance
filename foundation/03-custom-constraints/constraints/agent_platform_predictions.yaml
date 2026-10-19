@@ -1,0 +1,21 @@
+- name: "custom.vertexAiEndpointRequireCmek"
+  resource_types:
+    - "aiplatform.googleapis.com/Endpoint"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.encryptionSpec.kmsKeyName) || resource.encryptionSpec.kmsKeyName == ''"
+  action_type: "DENY"
+  display_name: "Enforce CMEK on Agent Platform Prediction Endpoints"
+  description: "Requires Customer Managed Encryption Keys (CMEK) on Vertex AI / Agent Platform Prediction Endpoints."
+
+- name: "custom.vertexAiEndpointRequirePrivateNetwork"
+  resource_types:
+    - "aiplatform.googleapis.com/Endpoint"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.network) || resource.network == ''"
+  action_type: "DENY"
+  display_name: "Enforce Private Network on Agent Platform Endpoints"
+  description: "Requires Vertex AI / Agent Platform prediction endpoints to be deployed with private VPC networking."

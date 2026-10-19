@@ -1,0 +1,22 @@
+- name: "custom.vertexAiTrainingRequireCmek"
+  resource_types:
+    - "aiplatform.googleapis.com/CustomJob"
+    - "aiplatform.googleapis.com/HyperparameterTuningJob"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.encryptionSpec.kmsKeyName) || resource.encryptionSpec.kmsKeyName == ''"
+  action_type: "DENY"
+  display_name: "Enforce CMEK on Agent Platform Training Jobs"
+  description: "Requires Customer Managed Encryption Keys (CMEK) on Vertex AI / Agent Platform CustomJobs and Training Jobs."
+
+- name: "custom.vertexAiTrainingRequirePrivateNetwork"
+  resource_types:
+    - "aiplatform.googleapis.com/CustomJob"
+  method_types:
+    - "CREATE"
+    - "UPDATE"
+  condition: "!has(resource.jobSpec.network) || resource.jobSpec.network == ''"
+  action_type: "DENY"
+  display_name: "Enforce Private Network on Agent Platform Training Jobs"
+  description: "Requires Vertex AI / Agent Platform CustomJobs to be attached to an authorized VPC network."

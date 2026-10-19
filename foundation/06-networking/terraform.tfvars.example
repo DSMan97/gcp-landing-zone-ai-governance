@@ -1,0 +1,23 @@
+/**
+ * Phase 06: Networking - Example tfvars
+ */
+
+organization_id         = "123456789012"
+network_host_project_id = "prj-net-shared-hub"
+primary_region          = "europe-west1"
+psc_endpoint_ip         = "10.100.100.100"
+access_policy_title     = "Enterprise Security & Data Protection Policy"
+service_perimeter_name  = "sp_regulated_data_shield"
+
+trusted_ingress_ip_ranges = [
+  "198.51.100.0/24",
+  "203.0.113.0/24"
+]
+
+protected_projects = [
+  "projects/123456789012"
+]
+
+authorized_ingress_identities = [
+  "serviceAccount:sa-tf-deployer@prj-bootstrap-mgmt.iam.gserviceaccount.com"
+]

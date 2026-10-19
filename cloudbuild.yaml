@@ -1,0 +1,184 @@
+# ==============================================================================
+# Cloud Build Pipeline - GCP Landing Zone
+# Homólogo de los flujos de trabajo de GitHub Actions (.github/workflows)
+#
+# Proporciona validación estática, verificación de formato, validación de módulos
+# y ejecución secuencial ordenada de fases (Plan / Apply) para la Landing Zone.
+# ==============================================================================
+
+substitutions:
+  _ACTION: 'plan'                  # Acción a ejecutar: 'plan' (validación/plan) o 'apply' (despliegue)
+  _TERRAFORM_VERSION: '1.9.0'      # Versión fija de Terraform para paridad y reproducibilidad
+  _WORKDIR: 'gcp-landing-zone'     # Directorio base del proyecto de Landing Zone
+
+steps:
+  # ----------------------------------------------------------------------------
+  # Paso 1: Verificación de formato de código (terraform fmt)
+  # Valida de forma recursiva que todos los archivos sigan las convenciones canónicas.
+  # ----------------------------------------------------------------------------
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-fmt-check'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        echo "============================================================"
+        echo ">>> Verificando formato de Terraform (fmt -check -recursive)"
+        echo "============================================================"
+        terraform fmt -check -recursive
+
+  # ----------------------------------------------------------------------------
+  # Paso 2: Validación estática de módulos reutilizables
+  # Inicializa sin backend y valida la sintaxis y tipos de cada módulo.
+  # ----------------------------------------------------------------------------
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-validate-modules'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        modules=(
+          "modules/org-policy"
+          "modules/custom-constraint"
+          "modules/iam-conditional-binding"
+          "modules/audit-config"
+          "modules/log-sink"
+          "modules/project-factory"
+          "modules/data-governance-labels"
+          "modules/vpc-sc-perimeter"
+        )
+
+        echo "============================================================"
+        echo ">>> Validando Módulos Reutilizables"
+        echo "============================================================"
+        for mod in "${modules[@]}"; do
+          if [ -d "$mod" ]; then
+            echo "--> Validando módulo: $mod"
+            (cd "$mod" && terraform init -backend=false && terraform validate)
+          else
+            echo "--> [ALERTA] Directorio no encontrado: $mod"
+          fi
+        done
+
+  # ----------------------------------------------------------------------------
+  # Paso 3: Validación estática de etapas y entornos de la Landing Zone
+  # Inicializa sin backend y valida las capas de foundation y ambientes.
+  # ----------------------------------------------------------------------------
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-validate-stages'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        stages=(
+          "bootstrap"
+          "foundation/00-organization"
+          "foundation/01-folders"
+          "foundation/02-org-policies"
+          "foundation/03-custom-constraints"
+          "foundation/04-iam"
+          "foundation/05-logging"
+          "foundation/06-networking"
+          "foundation/07-ai-governance"
+          "environments/dev"
+          "environments/stg"
+          "environments/prod"
+        )
+
+        echo "============================================================"
+        echo ">>> Validando Etapas y Entornos"
+        echo "============================================================"
+        for stage in "${stages[@]}"; do
+          if [ -d "$stage" ]; then
+            echo "--> Validando etapa: $stage"
+            (cd "$stage" && terraform init -backend=false && terraform validate)
+          else
+            echo "--> [ALERTA] Directorio no encontrado: $stage"
+          fi
+        done
+
+  # ----------------------------------------------------------------------------
+  # Paso 4: Ejecución condicional de Terraform Plan
+  # Ejecuta plan especulativo ordenado cuando _ACTION == 'plan'.
+  # ----------------------------------------------------------------------------
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-plan'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        if [ "${_ACTION}" = "plan" ]; then
+          stages=(
+            "bootstrap"
+            "foundation/00-organization"
+            "foundation/01-folders"
+            "foundation/02-org-policies"
+            "foundation/03-custom-constraints"
+            "foundation/04-iam"
+            "foundation/05-logging"
+            "foundation/06-networking"
+            "foundation/07-ai-governance"
+            "environments/dev"
+            "environments/stg"
+            "environments/prod"
+          )
+
+          echo "============================================================"
+          echo ">>> Ejecutando Terraform Plan Ordenado"
+          echo "============================================================"
+          for stage in "${stages[@]}"; do
+            if [ -d "$stage" ]; then
+              echo "--> Planificando etapa: $stage"
+              (cd "$stage" && terraform init && terraform plan -input=false)
+            fi
+          done
+        else
+          echo ">>> Omitiendo paso de Plan (_ACTION='${_ACTION}')"
+        fi
+
+  # ----------------------------------------------------------------------------
+  # Paso 5: Ejecución condicional de Terraform Apply
+  # Ejecuta el despliegue ordenado y auto-aprobado cuando _ACTION == 'apply'.
+  # ----------------------------------------------------------------------------
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-apply'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        if [ "${_ACTION}" = "apply" ]; then
+          stages=(
+            "bootstrap"
+            "foundation/00-organization"
+            "foundation/01-folders"
+            "foundation/02-org-policies"
+            "foundation/03-custom-constraints"
+            "foundation/04-iam"
+            "foundation/05-logging"
+            "foundation/06-networking"
+            "foundation/07-ai-governance"
+            "environments/dev"
+            "environments/stg"
+            "environments/prod"
+          )
+
+          echo "============================================================"
+          echo ">>> Ejecutando Terraform Apply Ordenado"
+          echo "============================================================"
+          for stage in "${stages[@]}"; do
+            if [ -d "$stage" ]; then
+              echo "--> Desplegando etapa: $stage"
+              (cd "$stage" && terraform init && terraform apply -auto-approve -input=false)
+            fi
+          done
+        else
+          echo ">>> Omitiendo paso de Apply (_ACTION='${_ACTION}')"
+        fi
+
+options:
+  logging: CLOUD_LOGGING_ONLY

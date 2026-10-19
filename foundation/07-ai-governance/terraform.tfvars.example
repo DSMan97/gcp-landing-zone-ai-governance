@@ -1,0 +1,13 @@
+/**
+ * Phase 07: AI Governance - Example tfvars
+ */
+
+project_id             = "prj-prod-ai-governance-01"
+project_name           = "AI Governance & Agent Platform Template"
+folder_id              = "folders/123456789012"
+billing_account        = "012345-6789AB-CDEF01"
+primary_region         = "europe-west1"
+environment            = "prod"
+cost_center            = "cc-ai-agent-governance"
+business_unit          = "ai-clinical-fintech"
+service_perimeter_name = "accessPolicies/123456789012/servicePerimeters/sp_regulated_data_shield"

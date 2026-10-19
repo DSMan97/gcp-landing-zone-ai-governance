@@ -1,0 +1,106 @@
+# ==============================================================================
+# Cloud Build - Plan & Validation Pipeline (Pull Requests)
+# Homólogo de .github/workflows/plan.yml
+# ==============================================================================
+
+substitutions:
+  _TERRAFORM_VERSION: '1.9.0'
+  _WORKDIR: 'gcp-landing-zone'
+
+steps:
+  # 1. Verificación de formato
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-fmt-check'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        echo ">>> Verificando formato de Terraform (fmt -check -recursive)"
+        terraform fmt -check -recursive
+
+  # 2. Validación de módulos
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-validate-modules'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        modules=(
+          "modules/org-policy"
+          "modules/custom-constraint"
+          "modules/iam-conditional-binding"
+          "modules/audit-config"
+          "modules/log-sink"
+          "modules/project-factory"
+          "modules/data-governance-labels"
+          "modules/vpc-sc-perimeter"
+        )
+        for mod in "${modules[@]}"; do
+          if [ -d "$mod" ]; then
+            echo "--> Validando módulo: $mod"
+            (cd "$mod" && terraform init -backend=false && terraform validate)
+          fi
+        done
+
+  # 3. Validación de etapas de fundación y entornos
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-validate-stages'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        stages=(
+          "bootstrap"
+          "foundation/00-organization"
+          "foundation/01-folders"
+          "foundation/02-org-policies"
+          "foundation/03-custom-constraints"
+          "foundation/04-iam"
+          "foundation/05-logging"
+          "foundation/06-networking"
+          "foundation/07-ai-governance"
+          "environments/dev"
+          "environments/stg"
+          "environments/prod"
+        )
+        for stage in "${stages[@]}"; do
+          if [ -d "$stage" ]; then
+            echo "--> Validando etapa: $stage"
+            (cd "$stage" && terraform init -backend=false && terraform validate)
+          fi
+        done
+
+  # 4. Terraform Plan especulativo
+  - name: 'hashicorp/terraform:${_TERRAFORM_VERSION}'
+    id: 'terraform-plan'
+    entrypoint: 'sh'
+    dir: '${_WORKDIR}'
+    args:
+      - '-c'
+      - |
+        stages=(
+          "bootstrap"
+          "foundation/00-organization"
+          "foundation/01-folders"
+          "foundation/02-org-policies"
+          "foundation/03-custom-constraints"
+          "foundation/04-iam"
+          "foundation/05-logging"
+          "foundation/06-networking"
+          "foundation/07-ai-governance"
+          "environments/dev"
+          "environments/stg"
+          "environments/prod"
+        )
+        for stage in "${stages[@]}"; do
+          if [ -d "$stage" ]; then
+            echo "--> Generando plan para: $stage"
+            (cd "$stage" && terraform init && terraform plan -input=false)
+          fi
+        done
+
+options:
+  logging: CLOUD_LOGGING_ONLY

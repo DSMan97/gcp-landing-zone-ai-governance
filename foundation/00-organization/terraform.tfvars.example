@@ -1,0 +1,11 @@
+/**
+ * Phase 00: Organization - Example tfvars
+ */
+
+organization_id              = "123456789012"
+security_team_email          = "secops@bank-clinical-enterprise.com"
+legal_team_email             = "compliance-legal@bank-clinical-enterprise.com"
+billing_team_email           = "finops@bank-clinical-enterprise.com"
+scc_notification_pubsub_topic = "projects/prj-sec-monitoring/topics/top-scc-findings"
+enable_scc_notifications     = true
+enable_access_approval       = true
