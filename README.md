@@ -1,4 +1,4 @@
-# GCP Landing Zone - Enterprise Banking & Clinical Data Platform
+# GCP Landing Zone - Enterprise Banking & Clinical Data Platform (Template)
 
 Landing Zone de nivel empresarial construida en Terraform para entidades altamente reguladas (Banca y Datos Clínicos/Salud), con cumplimiento de estándares **PCI-DSS**, **HIPAA**, **GDPR** e **ISO 27001**.
 
