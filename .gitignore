@@ -10,9 +10,10 @@ out/
 # =============================================================================
 # Terraform Core & Local Cache
 # =============================================================================
-# Directorios de plugins y módulos descargados localmente
-**/.terraform/*
+# Directorios de plugins y módulos descargados localmente (.terraform)
 .terraform/
+**/.terraform/
+**/.terraform/*
 
 # Registros de fallos
 crash.log
