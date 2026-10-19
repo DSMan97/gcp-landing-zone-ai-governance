@@ -1,4 +1,4 @@
-# AI Governance Framework: Risks, Guardrails & Compliance
+# Marco de Gobernanza de IA: Riesgos, Guardrails y Cumplimiento
 
 Este documento define el marco de gobernanza, gestión de riesgos y controles técnicos aplicados a las cargas de trabajo de Inteligencia Artificial (IA), Machine Learning (ML) y Agentes Autónomos desplegados sobre Google Cloud (Vertex AI, Agent Platform, BigQuery ML) en la Landing Zone, en conformidad con **NIST AI RMF 1.0**, **ISO/IEC 42001**, **EU AI Act**, **GDPR**, **PCI-DSS v4.0** y **HIPAA**.
 
